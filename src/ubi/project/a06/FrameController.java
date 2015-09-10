@@ -15,10 +15,10 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 public class FrameController implements Initializable{
-	@FXML		private	Button							addIRKitButton;				//IRKit追加ボタン
+	@FXML		private	Button				addIRKitButton;			//IRKit追加ボタン
 	@FXML		private	ComboBox<Object>	targetIRKitComboBox;	//既知のIRKitを選択するComboBox
-	@FXML		private	TextArea						statusTextArea;				
-	@FXML		private	TextField						addIRKitTextField;			//IRKitを追加する場合のIPアドレス記入欄
+	@FXML		private	TextArea			statusTextArea;			
+	@FXML		private	TextField			addIRKitTextField;		//IRKitを追加する場合のIPアドレス記入欄
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources){

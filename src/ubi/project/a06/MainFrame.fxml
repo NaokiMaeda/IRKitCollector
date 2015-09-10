@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.web.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
@@ -34,7 +35,7 @@
             <HBox prefHeight="100.0" prefWidth="200.0">
                <children>
                   <TextField fx:id="addIRKitTextField" maxWidth="-Infinity" onKeyPressed="#setOnKeyPressed" prefWidth="350.0" />
-                  <Button fx:id="addIRKitButton" mnemonicParsing="false" prefWidth="50.0" text="Add" />
+                  <Button fx:id="addIRKitButton" mnemonicParsing="false" onAction="#getAddIRKitText" prefWidth="50.0" text="Add" />
                </children>
             </HBox>
          </children>
@@ -63,6 +64,13 @@
             <TextArea maxHeight="1.7976931348623157E308" minHeight="-Infinity" prefHeight="360.0" prefWidth="400.0" />
          </children>
       </VBox>
-      <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+      <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+         <children>
+            <Text fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="Operation" textAlignment="CENTER" wrappingWidth="400.0">
+               <font>
+                  <Font size="25.0" />
+               </font>
+            </Text>
+         </children></VBox>
    </children>
 </GridPane>
