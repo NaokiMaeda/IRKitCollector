@@ -46,7 +46,10 @@ public class HTTPPost {
 		StringBuilder builder = new StringBuilder();
 		
 		for(String key : map.keySet()){
-			builder.append(key + "=" + map.get(key) + "&");
+			builder.append(key);
+			builder.append("=");
+			builder.append(map.get(key));
+			builder.append("&");
 		}
 		builder.deleteCharAt(builder.length() - 1);
 		

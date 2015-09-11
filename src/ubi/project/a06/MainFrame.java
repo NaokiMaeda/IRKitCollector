@@ -8,10 +8,11 @@ import javafx.stage.Stage;
 
 public class MainFrame extends Application{
 	//UI関係
-	private	FrameController	controller;
+	private	FrameController		controller;
 	private	FXMLLoader			loader;
-	private	GridPane				content;
-	private	Scene					scene;
+	private	GridPane			content;
+	private	Scene				scene;
+
 	public static void main(String[] args) {
 		launch(args);
 	}
