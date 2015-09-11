@@ -34,7 +34,7 @@
             </Text>
             <HBox prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <TextField fx:id="addIRKitTextField" maxWidth="-Infinity" onKeyPressed="#setOnKeyPressed" prefWidth="350.0" />
+                  <TextField fx:id="addIRKitTextField" maxWidth="-Infinity" onKeyPressed="#addEnterEventHandler" prefWidth="350.0" promptText="IP Address only" />
                   <Button fx:id="addIRKitButton" mnemonicParsing="false" onAction="#getAddIRKitText" prefWidth="50.0" text="Add" />
                </children>
             </HBox>
@@ -71,6 +71,17 @@
                   <Font size="25.0" />
                </font>
             </Text>
+            <HBox prefWidth="400.0">
+               <children>
+                  <Text fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="ポーリング間隔" wrappingWidth="89.318359375">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Text>
+                  <TextField fx:id="pollingIntervalText" />
+                  <ToggleButton fx:id="pollingButton" mnemonicParsing="false" onAction="#changePollingEventHandler" text="Polling Start" />
+               </children>
+            </HBox>
          </children></VBox>
    </children>
 </GridPane>
