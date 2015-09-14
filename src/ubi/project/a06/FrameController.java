@@ -35,6 +35,9 @@ public class FrameController implements Initializable{
 		try {
 			targetIRKitList = FXCollections.observableArrayList();
 			targetIRKitComboBox.setItems(targetIRKitList);
+			
+			pollingButton.setDisable(true);
+			
 			InetAddress address = InetAddress.getLocalHost();
 			statusTextArea.setText(address.getHostAddress().toString());
 		} catch (UnknownHostException e) {
@@ -50,12 +53,22 @@ public class FrameController implements Initializable{
 	}
 	
 	@FXML
+	public String getComboBoxItem(){
+		return targetIRKitComboBox.getValue();
+	}
+	
+	@FXML
 	public double getPollingInterval(){
 		return pollingIntervalSlider.getValue();
 	}
 	
+	@FXML
 	private void setComboBoxItem(String item){
 		targetIRKitList.add(item);
+		if(targetIRKitList.size() != 0){
+			pollingButton.setDisable(false);
+			targetIRKitComboBox.getSelectionModel().select(targetIRKitList.size() - 1);
+		}
 	}
 	
 	@FXML
@@ -64,11 +77,19 @@ public class FrameController implements Initializable{
 			setComboBoxItem(getAddIRKitText());
 		}
 	}
-
+	
+	@FXML
+	private void ClickEventHandler(ActionEvent e){
+		setComboBoxItem(getAddIRKitText());
+	}
+	
 	@FXML
 	private void changePollingEventHandler(ActionEvent event){
 		if(pollingButton.isSelected()){
 			pollingButton.setText("Polling Stop");
+			HTTPGet httpGet = new HTTPGet(getComboBoxItem());
+			pollingService = new PollingService(httpGet , getPollingInterval());
+			pollingService.start();
 		}else{
 			pollingButton.setText("Polling Start");
 		}

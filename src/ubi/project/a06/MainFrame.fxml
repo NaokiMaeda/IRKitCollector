@@ -35,7 +35,7 @@
             <HBox prefHeight="100.0" prefWidth="200.0">
                <children>
                   <TextField fx:id="addIRKitTextField" maxWidth="-Infinity" onKeyPressed="#addEnterEventHandler" prefWidth="350.0" promptText="IP Address only" />
-                  <Button fx:id="addIRKitButton" mnemonicParsing="false" onAction="#getAddIRKitText" prefWidth="50.0" text="Add" />
+                  <Button fx:id="addIRKitButton" mnemonicParsing="false" onAction="#ClickEventHandler" prefWidth="50.0" text="Add" />
                </children>
             </HBox>
          </children>

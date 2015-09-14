@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
@@ -62,11 +63,16 @@ public class HTTPGet {
 	public void getMessage() throws IOException{
 		String responseData = get("message");
 		//GetMessage getMessage = gson.fromJson(get("message") , GetMessage.class);
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd__HH_mm_ss");
-		File file = new File(sdf.toString() + ".json");
+		File file = new File(getCurrentTime() + ".json");
 		PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
 		pw.print(responseData);
 		pw.close();
+	}
+	
+	private String getCurrentTime(){
+		Date date = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd__HH_mm_ss");
+		return sdf.format(date);
 	}
 	
 }
