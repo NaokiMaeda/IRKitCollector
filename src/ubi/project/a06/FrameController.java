@@ -28,7 +28,7 @@ public class FrameController implements Initializable{
 	@FXML	private	ToggleButton			pollingButton;			//ポーリング開始・停止ボタン
 	
 			private	ObservableList<String>	targetIRKitList;		//ComboBoxのアイテムリスト
-	
+			private	PollingService			pollingService;
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources){
@@ -61,8 +61,7 @@ public class FrameController implements Initializable{
 	@FXML
 	private void addEnterEventHandler(KeyEvent event){
 		if(event.getCode().equals(KeyCode.ENTER)){		//TextFieldでEnterキーを押した場合
-			String address = getAddIRKitText();
-			setComboBoxItem(address);
+			setComboBoxItem(getAddIRKitText());
 		}
 	}
 

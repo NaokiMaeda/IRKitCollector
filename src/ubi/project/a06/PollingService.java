@@ -4,17 +4,20 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
 public class PollingService extends Service{
+	private HTTPGet	httpGet;
+	
+	public PollingService(HTTPGet httpGet) {
+		this.httpGet = httpGet;
+	}
 	
 	@Override
 	protected Task createTask() {
-		Task task = new Task(){
-
+		Task<Void> task = new Task<Void>(){
 			@Override
-			protected Object call() throws Exception {
-				
+			protected Void call() throws Exception {
+				httpGet.getMessage();
 				return null;
 			}
-			
 		};
 		return task;
 	}
