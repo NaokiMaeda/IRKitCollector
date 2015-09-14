@@ -17,9 +17,7 @@ public class PollingService extends Service{
 		Task<Void> task = new Task<Void>(){
 			@Override
 			protected Void call() throws Exception {
-				httpGet.getMessage();
-				System.out.println("Get");
-				Thread.sleep(pollingInterval);
+				
 				return null;
 			}
 		};
