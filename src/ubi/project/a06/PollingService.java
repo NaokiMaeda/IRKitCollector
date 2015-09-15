@@ -3,7 +3,7 @@ package ubi.project.a06;
 import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
 
-public class PollingService extends ScheduledService<Void>{
+public class PollingService extends ScheduledService<String>{
 	private HTTPGet	httpGet;
 	
 	public PollingService(HTTPGet httpGet) {
@@ -12,12 +12,12 @@ public class PollingService extends ScheduledService<Void>{
 	
 	@Override
 	protected Task createTask() {
-		Task<Void> task = new Task<Void>(){
+		Task<String> task = new Task<String>(){
 			@Override
-			protected Void call() throws Exception {
-				//httpGet.get();
-				System.out.println("Task Call");
-				return null;
+			protected String call() throws Exception {
+				String msg = httpGet.get("");
+				//System.out.println("Task Call");
+				return msg;
 			}
 		};
 		return task;

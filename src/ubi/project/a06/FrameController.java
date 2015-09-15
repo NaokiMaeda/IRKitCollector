@@ -24,7 +24,8 @@ public class FrameController implements Initializable{
 	@FXML	private	Button					addIRKitButton;			//IRKit追加ボタン
 	@FXML	private	ComboBox<String>		targetIRKitComboBox;	//既知のIRKitを選択するComboBox
 	@FXML	private	Slider					pollingIntervalSlider;	//ポーリング間隔入力
-	@FXML	private	TextArea				statusTextArea;			//通信結果表示欄
+	@FXML	private	TextArea				statusTextArea;			//クライアント状態表示欄
+	@FXML	private	TextArea				resultTextArea;			//通信結果表示欄
 	@FXML	private	TextField				addIRKitTextField;		//IRKitを追加する場合のIPアドレス記入欄
 	@FXML	private	ToggleButton			pollingButton;			//ポーリング開始・停止ボタン
 	
@@ -86,6 +87,9 @@ public class FrameController implements Initializable{
 			pollingButton.setText("Polling Stop");
 			pollingService = new PollingService(new HTTPGet(getComboBoxItem()));
 			pollingService.setPeriod(Duration.seconds(getPollingInterval()));
+			pollingService.setOnScheduled(e -> {
+				resultTextArea.appendText(pollingService.getLastValue());
+			});
 			pollingService.start();
 		}else{
 			pollingButton.setText("Polling Start");

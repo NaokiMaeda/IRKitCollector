@@ -61,7 +61,7 @@
                   <Font size="25.0" />
                </font>
             </Text>
-            <TextArea maxHeight="1.7976931348623157E308" minHeight="-Infinity" prefHeight="360.0" prefWidth="400.0" />
+            <TextArea fx:id="resultTextArea" maxHeight="1.7976931348623157E308" minHeight="-Infinity" prefHeight="360.0" prefWidth="400.0" />
          </children>
       </VBox>
       <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
@@ -78,7 +78,7 @@
                         <Font size="14.0" />
                      </font>
                   </Text>
-                  <Slider fx:id="pollingIntervalSlider" majorTickUnit="50.0" minorTickCount="4" showTickLabels="true" showTickMarks="true" snapToTicks="true" />
+                  <Slider fx:id="pollingIntervalSlider" majorTickUnit="50.0" minorTickCount="4" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="10.0" />
                   <ToggleButton fx:id="pollingButton" mnemonicParsing="false" onAction="#changePollingEventHandler" text="Polling Start" />
                </children>
             </HBox>
