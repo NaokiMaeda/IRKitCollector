@@ -18,6 +18,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.util.Duration;
 
 public class FrameController implements Initializable{
 	@FXML	private	Button					addIRKitButton;			//IRKit追加ボタン
@@ -45,24 +46,20 @@ public class FrameController implements Initializable{
 		}
 	}
 	
-	@FXML
 	public String getAddIRKitText(){
 		String msg = addIRKitTextField.getText();
 		addIRKitTextField.clear();
 		return msg;
 	}
 	
-	@FXML
 	public String getComboBoxItem(){
 		return targetIRKitComboBox.getValue();
 	}
 	
-	@FXML
 	public double getPollingInterval(){
 		return pollingIntervalSlider.getValue();
 	}
 	
-	@FXML
 	private void setComboBoxItem(String item){
 		targetIRKitList.add(item);
 		if(targetIRKitList.size() != 0){
@@ -87,11 +84,12 @@ public class FrameController implements Initializable{
 	private void changePollingEventHandler(ActionEvent event){
 		if(pollingButton.isSelected()){
 			pollingButton.setText("Polling Stop");
-			HTTPGet httpGet = new HTTPGet(getComboBoxItem());
-			pollingService = new PollingService(httpGet , getPollingInterval());
+			pollingService = new PollingService(new HTTPGet(getComboBoxItem()));
+			pollingService.setPeriod(Duration.seconds(getPollingInterval()));
 			pollingService.start();
 		}else{
 			pollingButton.setText("Polling Start");
+			pollingService.cancel();
 		}
 	}
 	

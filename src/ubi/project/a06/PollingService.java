@@ -1,14 +1,12 @@
 package ubi.project.a06;
 
-import javafx.concurrent.Service;
+import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
 
-public class PollingService extends Service{
-	private	long	pollingInterval;
+public class PollingService extends ScheduledService<Void>{
 	private HTTPGet	httpGet;
 	
-	public PollingService(HTTPGet httpGet , double pollingInterval) {
-		this.pollingInterval = (long)pollingInterval * 1000;
+	public PollingService(HTTPGet httpGet) {
 		this.httpGet = httpGet;
 	}
 	
@@ -17,7 +15,8 @@ public class PollingService extends Service{
 		Task<Void> task = new Task<Void>(){
 			@Override
 			protected Void call() throws Exception {
-				
+				//httpGet.get();
+				System.out.println("Task Call");
 				return null;
 			}
 		};
