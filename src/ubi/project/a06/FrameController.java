@@ -7,7 +7,6 @@ import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -16,8 +15,6 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 
 public class FrameController implements Initializable{
 	@FXML	private	Button					addIRKitButton;			//IRKit追加ボタン
@@ -38,7 +35,10 @@ public class FrameController implements Initializable{
 			targetIRKitComboBox.setItems(targetIRKitList);
 			
 			pollingButton.setDisable(true);
+			
 			pollingButton.setOnAction(new PollingButtonEventListener(this));
+			addIRKitButton.setOnAction(new AddIRKitButtonEventListener(this));
+			addIRKitTextField.setOnKeyPressed(new AddIRKitTextEventListener(this));
 			
 			InetAddress address = InetAddress.getLocalHost();
 			statusTextArea.setText(address.getHostAddress().toString());
@@ -65,7 +65,8 @@ public class FrameController implements Initializable{
 		return pollingIntervalSlider.getValue();
 	}
 	
-	private void setComboBoxItem(String item){
+	public void setComboBoxItem(String item){
+		if(targetIRKitList.contains(item))	return;
 		targetIRKitList.add(item);
 		if(targetIRKitList.size() != 0){
 			pollingButton.setDisable(false);
@@ -79,18 +80,6 @@ public class FrameController implements Initializable{
 	
 	public void setResultTextArea(String msg){
 		resultTextArea.appendText(msg);
-	}
-	
-	@FXML
-	private void addEnterEventHandler(KeyEvent event){
-		if(event.getCode().equals(KeyCode.ENTER)){		//TextFieldでEnterキーを押した場合
-			setComboBoxItem(getAddIRKitText());
-		}
-	}
-	
-	@FXML
-	private void ClickEventHandler(ActionEvent e){
-		setComboBoxItem(getAddIRKitText());
 	}
 	
 }

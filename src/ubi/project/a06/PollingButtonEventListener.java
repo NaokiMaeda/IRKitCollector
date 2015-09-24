@@ -21,8 +21,7 @@ public class PollingButtonEventListener implements EventHandler<ActionEvent>{
 			pollingService.setPeriod(Duration.seconds(controller.getPollingInterval()));
 			pollingService.start();
 			pollingService.setOnScheduled(e -> {
-				//resultTextArea.appendText(pollingService.getLastValue());
-				System.out.println(pollingService.getLastValue());
+				controller.setResultTextArea(pollingService.getLastValue());
 			});
 		}else{
 			controller.setPollingButton("Polling Start");

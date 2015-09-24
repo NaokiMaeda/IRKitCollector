@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
@@ -20,7 +21,8 @@ public class PollingService extends ScheduledService<String>{
 	
 	public PollingService(HTTPGet httpGet) {
 		this.httpGet = httpGet;
-		gson = new Gson();
+		//gson = new Gson();									//JSON改行無し
+		gson = new GsonBuilder().setPrettyPrinting().create();	//JSON改行有り
 	}
 	
 	@Override
@@ -29,7 +31,6 @@ public class PollingService extends ScheduledService<String>{
 			@Override
 			protected String call() throws Exception {
 				String response = httpGet.get("messages");
-				System.out.println(response);
 				SaveJSON(response);
 				return response;
 			}
@@ -44,6 +45,7 @@ public class PollingService extends ScheduledService<String>{
 	}
 	
 	private void SaveJSON(String saveData){
+		if(saveData == null)	return;
 		GetMessage getMessage = gson.fromJson(saveData , GetMessage.class);
 		String data = gson.toJson(getMessage);
 		try {
