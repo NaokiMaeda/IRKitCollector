@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.GridPane?>
 
-<GridPane id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ubi.project.a06.FrameController">
+<GridPane id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ubi.project.a06.FrameController">
   <columnConstraints>
     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -79,7 +79,7 @@
                      </font>
                   </Text>
                   <Slider fx:id="pollingIntervalSlider" majorTickUnit="50.0" minorTickCount="4" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="10.0" />
-                  <ToggleButton fx:id="pollingButton" mnemonicParsing="false" onAction="#changePollingEventHandler" text="Polling Start" />
+                  <ToggleButton fx:id="pollingButton" mnemonicParsing="false" text="Polling Start" />
                </children>
             </HBox>
          </children></VBox>

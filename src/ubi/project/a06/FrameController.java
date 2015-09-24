@@ -18,7 +18,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.util.Duration;
 
 public class FrameController implements Initializable{
 	@FXML	private	Button					addIRKitButton;			//IRKit追加ボタン
@@ -30,7 +29,7 @@ public class FrameController implements Initializable{
 	@FXML	private	ToggleButton			pollingButton;			//ポーリング開始・停止ボタン
 	
 			private	ObservableList<String>	targetIRKitList;		//ComboBoxのアイテムリスト
-			private	PollingService			pollingService;
+			
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources){
@@ -39,6 +38,7 @@ public class FrameController implements Initializable{
 			targetIRKitComboBox.setItems(targetIRKitList);
 			
 			pollingButton.setDisable(true);
+			pollingButton.setOnAction(new PollingButtonEventListener(this));
 			
 			InetAddress address = InetAddress.getLocalHost();
 			statusTextArea.setText(address.getHostAddress().toString());
@@ -57,6 +57,10 @@ public class FrameController implements Initializable{
 		return targetIRKitComboBox.getValue();
 	}
 	
+	public Boolean getPollingButton(){
+		return pollingButton.isSelected();
+	}
+	
 	public double getPollingInterval(){
 		return pollingIntervalSlider.getValue();
 	}
@@ -69,6 +73,14 @@ public class FrameController implements Initializable{
 		}
 	}
 	
+	public void setPollingButton(String msg){
+		pollingButton.setText(msg);
+	}
+	
+	public void setResultTextArea(String msg){
+		resultTextArea.appendText(msg);
+	}
+	
 	@FXML
 	private void addEnterEventHandler(KeyEvent event){
 		if(event.getCode().equals(KeyCode.ENTER)){		//TextFieldでEnterキーを押した場合
@@ -79,22 +91,6 @@ public class FrameController implements Initializable{
 	@FXML
 	private void ClickEventHandler(ActionEvent e){
 		setComboBoxItem(getAddIRKitText());
-	}
-	
-	@FXML
-	private void changePollingEventHandler(ActionEvent event){
-		if(pollingButton.isSelected()){
-			pollingButton.setText("Polling Stop");
-			pollingService = new PollingService(new HTTPGet(getComboBoxItem()));
-			pollingService.setPeriod(Duration.seconds(getPollingInterval()));
-			pollingService.setOnScheduled(e -> {
-				resultTextArea.appendText(pollingService.getLastValue());
-			});
-			pollingService.start();
-		}else{
-			pollingButton.setText("Polling Start");
-			pollingService.cancel();
-		}
 	}
 	
 }
