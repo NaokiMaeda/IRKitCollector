@@ -20,19 +20,19 @@ public class HTTPGet {
 	private	Gson			gson;
 	private	HttpTransport	httpTransport;
 	private	String 			HOST;
-	
+
 	public HTTPGet(String HOST){
 		this.HOST = HOST;
 		gson = new Gson();
 		httpTransport = new NetHttpTransport();
 	}
-	
+
 	public void get() throws IOException{
 		HttpRequestFactory requestFactory = httpTransport.createRequestFactory();
 		GenericUrl url = new GenericUrl("http://" + HOST);
 		HttpRequest request = requestFactory.buildGetRequest(url);
 		HttpResponse response = request.execute();
-		
+
 		try{
 			System.out.println(response.getStatusCode());
 			System.out.println(response.getContentType());
@@ -42,7 +42,7 @@ public class HTTPGet {
 		}
 		httpTransport.shutdown();
 	}
-	
+
 	public String get(String param) throws IOException{
 		String responseData = "";
 		httpTransport = new NetHttpTransport();
@@ -50,7 +50,7 @@ public class HTTPGet {
 		GenericUrl url = new GenericUrl("http://" + HOST + "/" + param);
 		HttpRequest request = requestFactory.buildGetRequest(url);
 		HttpResponse response = request.execute();
-		
+
 		try{
 			responseData = response.parseAsString();
 		}finally{
@@ -59,7 +59,7 @@ public class HTTPGet {
 		httpTransport.shutdown();
 		return responseData;
 	}
-	
+
 	public void getMessage() throws IOException{
 		String responseData = get("message");
 		//GetMessage getMessage = gson.fromJson(get("message") , GetMessage.class);
@@ -68,11 +68,11 @@ public class HTTPGet {
 		pw.print(responseData);
 		pw.close();
 	}
-	
+
 	private String getCurrentTime(){
 		Date date = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd__HH_mm_ss");
 		return sdf.format(date);
 	}
-	
+
 }
