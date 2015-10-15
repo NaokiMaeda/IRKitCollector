@@ -3,6 +3,7 @@ package ubi.project.a06;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
@@ -17,22 +18,24 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 
 public class FrameController implements Initializable{
-	@FXML	private	Button					addIRKitButton;			//IRKit追加ボタン
-	@FXML	private	ComboBox<String>		targetIRKitComboBox;	//既知のIRKitを選択するComboBox
-	@FXML	private	Slider					pollingIntervalSlider;	//ポーリング間隔入力
-	@FXML	private	TextArea				statusTextArea;			//クライアント状態表示欄
-	@FXML	private	TextArea				resultTextArea;			//通信結果表示欄
-	@FXML	private	TextField				addIRKitTextField;		//IRKitを追加する場合のIPアドレス記入欄
-	@FXML	private	ToggleButton			pollingButton;			//ポーリング開始・停止ボタン
+	@FXML	private	Button						addIRKitButton;			//IRKit追加ボタン
+	@FXML	private	ComboBox<String>			targetIRKitComboBox;	//既知のIRKitを選択するComboBox
+	@FXML	private	Slider						pollingIntervalSlider;	//ポーリング間隔入力
+	@FXML	private	TextArea					statusTextArea;			//クライアント状態表示欄
+	@FXML	private	TextArea					resultTextArea;			//通信結果表示欄
+	@FXML	private	TextField					addIRKitTextField;		//IRKitを追加する場合のIPアドレス記入欄
+	@FXML	private	ToggleButton				pollingButton;			//ポーリング開始・停止ボタン
 	
-			private	ObservableList<String>	targetIRKitList;		//ComboBoxのアイテムリスト
-			
+			private	ObservableList<String>		targetIRKitList;		//ComboBoxのアイテムリスト
+			private	HashMap<String , Boolean>	isPollingMap;			//対象IRKitがポーリング中か記録する
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources){
 		try {
 			targetIRKitList = FXCollections.observableArrayList();
 			targetIRKitComboBox.setItems(targetIRKitList);
+			
+			isPollingMap = new HashMap<String , Boolean>();
 			
 			pollingButton.setDisable(true);
 			
@@ -65,9 +68,15 @@ public class FrameController implements Initializable{
 		return pollingIntervalSlider.getValue();
 	}
 	
+	public Boolean getPollingFlag(String irkit){
+		if(!isPollingMap.containsKey(irkit))	return null;
+		return isPollingMap.get(irkit);
+	}
+	
 	public void setComboBoxItem(String item){
 		if(targetIRKitList.contains(item))	return;
 		targetIRKitList.add(item);
+		isPollingMap.put(item , false);
 		if(targetIRKitList.size() != 0){
 			pollingButton.setDisable(false);
 			targetIRKitComboBox.getSelectionModel().select(targetIRKitList.size() - 1);
@@ -76,6 +85,10 @@ public class FrameController implements Initializable{
 	
 	public void setPollingButton(String msg){
 		pollingButton.setText(msg);
+	}
+	
+	public void setPollingFlag(String irkit , Boolean flag){
+		isPollingMap.put(irkit , flag);
 	}
 	
 	public void setResultTextArea(String msg){

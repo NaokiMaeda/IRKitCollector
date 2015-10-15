@@ -31,6 +31,7 @@ public class PollingService extends ScheduledService<String>{
 			@Override
 			protected String call() throws Exception {
 				String response = httpGet.get("messages");
+				System.out.println(response);
 				SaveJSON(response);
 				return response;
 			}
@@ -45,7 +46,15 @@ public class PollingService extends ScheduledService<String>{
 	}
 	
 	private void SaveJSON(String saveData){
-		if(saveData == null)	return;
+		if(saveData == null){
+			System.out.println("null");
+			return;
+		}
+		if(saveData.equals("Null")){
+			System.out.println("null");
+			return;
+		}
+		
 		GetMessage getMessage = gson.fromJson(saveData , GetMessage.class);
 		String data = gson.toJson(getMessage);
 		try {
@@ -53,6 +62,7 @@ public class PollingService extends ScheduledService<String>{
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 			bw.write(data);
 			bw.flush();
+			bw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
