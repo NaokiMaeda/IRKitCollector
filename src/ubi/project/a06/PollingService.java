@@ -23,7 +23,7 @@ import ubi.project.a06.mysql.MySQL;
 public class PollingService extends ScheduledService<String>{
 	private	final	String	DATE_FORMAT = "yyyy_MM_dd__HH_mm_ss";
 	private	final	String	configFile	= "receivedata.json";
-	private			Date	date;
+	
 	private			Gson	gson;
 	private			HTTPGet	httpGet;
 	private			MySQL	mySQL;
@@ -38,7 +38,7 @@ public class PollingService extends ScheduledService<String>{
 	
 	public PollingService(HTTPGet httpGet) {
 		this.httpGet = httpGet;
-		//gson = new Gson();									//JSON改行無し
+		//gson = new Gson();										//JSON改行無し
 		gson	= new GsonBuilder().setPrettyPrinting().create();	//JSON改行有り
 		mySQL	= new MySQL(configFile);
 	}
