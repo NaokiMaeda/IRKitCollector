@@ -11,17 +11,20 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
 public class MySQL {
-	private Connection connection;
+	private Connection	connection;
+	private	Gson		gson;
 	
 	//DB情報
 	private	String		address;
 	private	String		host;
+	private	int			port;
 	private String		DBName;
 	private	String		table;
 	private String		user;
@@ -33,22 +36,24 @@ public class MySQL {
 	private	String				sql;
 	private	StringBuilder		columnBuilder;
 	private	StringBuilder		valueBuilder;
+	private	StringBuilder		deleteBuilder;
+	private	StringBuilder		whereBuilder;
+	private	ResultSet			resultSet;
 	
 	//DBデータ
 	private ResultSetMetaData					rsmd;
 	private	ArrayList<String>					column;
-	private	ArrayList<HashMap<String , Object>>	recodeList;
+	private	ArrayList<HashMap<String , Object>>	resultList;
 	
 	public MySQL(String configFile){
 		this.column = new ArrayList<>();
-		
 		setDBInfo(configFile);
 	}
 	
 	public void ConnectionDB(){
 		try {
 			connection = DriverManager.getConnection(address , user , password);
-			setColumn(column);
+			column = getColumnList(column);
 			System.out.println("接続完了");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -102,55 +107,81 @@ public class MySQL {
 		}
 	}
 	
-	public void select(){
-		if(!hasDB())	return;
-		try {
-			statement = connection.createStatement();
-			sql = "select * from receivedata";
-			ResultSet result = statement.executeQuery(sql);
-			recodeList = new ArrayList<>();
-			while(result.next()){
-				HashMap<String , Object> recode = new HashMap<>();
-				for(int i = 0; i < column.size(); i++){
-					recode.put(column.get(i) , result.getObject(i + 1));
-					//System.out.println(column.get(i) + result.getObject(i + 1));
-				}
-				recodeList.add(recode);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public ArrayList<HashMap<String , Object>> select(String sql){
+	public ArrayList<HashMap<String , Object>> select(){
 		if(!hasDB())	return null;
 		try {
 			statement = connection.createStatement();
-			this.sql = sql;
-			ResultSet result = statement.executeQuery(this.sql);
-			recodeList = new ArrayList<>();
+			sql = "select * from " + table;
+			ResultSet result = statement.executeQuery(sql);
+			resultList = new ArrayList<>();
 			while(result.next()){
 				HashMap<String , Object> recode = new HashMap<>();
 				for(int i = 0; i < column.size(); i++){
-					recode.put(column.get(i) , result.getObject(i + 1));
+					recode.put(column.get(i) , result.getObject(column.get(i)));
 				}
-				recodeList.add(recode);
+				resultList.add(recode);
 			}
+			resultSet.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return recodeList;
+		return resultList;
 	}
 	
-	public void delete(String sql){
-		
+	public ArrayList<HashMap<String , Object>> select(ArrayList<String> select , HashMap<String, Object> terms){
+		if(!hasDB())	return null;
+		try {
+			statement = connection.createStatement();
+			StringBuilder stringBuilder = new StringBuilder();
+			stringBuilder.append("select ");
+			for(int i = 0; i < select.size(); i++){
+				stringBuilder.append(select.get(i));
+				stringBuilder.append(", ");
+			}
+			stringBuilder.delete(stringBuilder.length() -2 , stringBuilder.length());
+			stringBuilder.append(" from ");
+			stringBuilder.append(table);
+			
+			sql = stringBuilder.toString();
+			sql += createWhere(terms);
+			
+			resultSet = statement.executeQuery(this.sql);
+			resultList = new ArrayList<>();
+			while(resultSet.next()){
+				HashMap<String , Object> recode = new HashMap<>();
+				for(int i = 0; i < select.size(); i++){
+					recode.put(select.get(i) , resultSet.getObject(select.get(i)));
+				}
+				resultList.add(recode);
+			}
+			resultSet.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return resultList;
+	}
+	
+	public void delete(HashMap<String , Object> deleteTerms){
+		if(!hasDB())	return;
+		try {
+			statement = connection.createStatement();
+			deleteBuilder = new StringBuilder();
+			deleteBuilder.append("delete from ");
+			deleteBuilder.append(table);
+			
+			sql = deleteBuilder.toString();
+			sql += createWhere(deleteTerms);
+			statement.executeUpdate(sql);
+		}catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void deleteAll(){
 		if(!hasDB())	return;
 		try {
 			statement = connection.createStatement();
-			sql = "truncate table " + table;
+			sql = "delete from " + table;
 			statement.executeUpdate(sql);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -159,6 +190,17 @@ public class MySQL {
 	
 	public ArrayList<String> getColumn(){
 		return this.column;
+	}
+	
+	private String createWhere(HashMap<String , Object> terms){
+		whereBuilder = new StringBuilder();
+		whereBuilder.append(" where ");
+		for (Map.Entry<String , Object> term : terms.entrySet()) {
+			whereBuilder.append(term.getKey());
+			whereBuilder.append(" = ");
+			whereBuilder.append(term.getValue());
+		}
+		return whereBuilder.toString();
 	}
 	
 	private boolean hasDB(){
@@ -172,34 +214,35 @@ public class MySQL {
 		return false;
 	}
 	
-	private void setColumn(ArrayList<String> column){
+	private ArrayList<String> getColumnList(ArrayList<String> column){
+		ArrayList<String> columnList = new ArrayList<>();
 		try {
 			statement = connection.createStatement();
-			sql = "select * from receivedata";
+			sql = "select * from " + table;
 			ResultSet result = statement.executeQuery(sql);
 			rsmd = result.getMetaData();
 			for(int i = 1; i <= rsmd.getColumnCount(); i++){
-				column.add(rsmd.getColumnName(i));
+				columnList.add(rsmd.getColumnName(i));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return columnList;
 	}
 	
 	private void setDBInfo(String configFile){
-		Gson gson = new Gson();
 		try {
 			DBInfo dbInfo = gson.fromJson(new FileReader(configFile) , DBInfo.class);
 			this.host		= dbInfo.getHost();
-			this.DBName		= dbInfo.getDBName();
+			this.port		= dbInfo.getPort();
+			this.DBName 	= dbInfo.getDBName();
 			this.table		= dbInfo.getTable();
 			this.user		= dbInfo.getUser();
 			this.password	= dbInfo.getPassword();
-			address = "jdbc:mysql://" + host + ":3306/" + DBName;
+			address = "jdbc:mysql://" + host + ":" + port + "/" + DBName;
 		} catch (JsonSyntaxException | JsonIOException | FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		
 	}
 	
 }

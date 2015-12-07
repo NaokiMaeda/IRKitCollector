@@ -57,7 +57,15 @@ public class FrameController implements Initializable{
 		return targetIRKitComboBox.getValue();
 	}
 	
-	public Boolean getPollingButton(){
+	public String getComboBoxItem(int x){
+		return targetIRKitComboBox.getItems().get(x);
+	}
+	
+	public Integer getComboBoxSize(){
+		return targetIRKitComboBox.getItems().size();
+	}
+	
+	public Boolean isSelectedPollingButton(){
 		return pollingButton.isSelected();
 	}
 	
