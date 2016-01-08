@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.google.gson.Gson;
@@ -18,8 +19,7 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
 public class MySQL {
-	private Connection	connection;
-	private	Gson		gson;
+	private Connection connection;
 	
 	//DB情報
 	private	String		address;
@@ -29,7 +29,8 @@ public class MySQL {
 	private	String		table;
 	private String		user;
 	private	String		password;
-
+	private	Gson		gson;
+	
 	//SQLクエリ
 	private	Statement			statement;
 	private	PreparedStatement	preparedStatement;
@@ -43,10 +44,12 @@ public class MySQL {
 	//DBデータ
 	private ResultSetMetaData					rsmd;
 	private	ArrayList<String>					column;
-	private	ArrayList<HashMap<String , Object>>	resultList;
+	private	LinkedHashMap<String , Object>		resultList;
+	//private	ArrayList<HashMap<String , Object>>	resultList;
 	
 	public MySQL(String configFile){
 		this.column = new ArrayList<>();
+		this.gson	= new Gson();
 		setDBInfo(configFile);
 	}
 	
@@ -81,10 +84,10 @@ public class MySQL {
 			columnBuilder.append("(");
 			valueBuilder.append("(");
 			
-			for(int i = 1; i < column.size(); i++){		//Index 0は,idなのでinsert対象から除外
-				columnBuilder.append(column.get(i));
+			for (Map.Entry<String , Object> insertData : data.entrySet()) {
+				columnBuilder.append(insertData.getKey());
 				columnBuilder.append(",");
-				valueBuilder.append("?");
+				valueBuilder.append(insertData.getValue());
 				valueBuilder.append(",");
 			}
 			
@@ -93,33 +96,41 @@ public class MySQL {
 			columnBuilder.append(")");
 			valueBuilder.append(")");
 			
+			
+			
 			sql = "insert into " + table;
 			sql += columnBuilder.toString() + " values" + valueBuilder.toString();
 			
+			statement = connection.createStatement();
+			statement.executeQuery(sql);
+			
+			/*
 			preparedStatement = connection.prepareStatement(sql);
 			for(int i = 1; i < column.size(); i++){
 				preparedStatement.setObject(i, data.get(column.get(i)));
 			}
 			preparedStatement.execute();
-			
+			*/
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public ArrayList<HashMap<String , Object>> select(){
+	public LinkedHashMap<String, Object> select(){
 		if(!hasDB())	return null;
 		try {
 			statement = connection.createStatement();
 			sql = "select * from " + table;
 			ResultSet result = statement.executeQuery(sql);
-			resultList = new ArrayList<>();
+			//resultList = new ArrayList<>();
+			resultList = new LinkedHashMap<>();
 			while(result.next()){
-				HashMap<String , Object> recode = new HashMap<>();
+				//HashMap<String , Object> recode = new HashMap<>();
 				for(int i = 0; i < column.size(); i++){
-					recode.put(column.get(i) , result.getObject(column.get(i)));
+					resultList.put(column.get(i), result.getString(column.get(i)));
+					//recode.put(column.get(i) , result.getObject(column.get(i)));
 				}
-				resultList.add(recode);
+				//resultList.add(recode);
 			}
 			resultSet.close();
 		} catch (SQLException e) {
@@ -128,7 +139,7 @@ public class MySQL {
 		return resultList;
 	}
 	
-	public ArrayList<HashMap<String , Object>> select(ArrayList<String> select , HashMap<String, Object> terms){
+	public LinkedHashMap<String , Object> select(ArrayList<String> select , HashMap<String, Object> terms){
 		if(!hasDB())	return null;
 		try {
 			statement = connection.createStatement();
@@ -145,14 +156,18 @@ public class MySQL {
 			sql = stringBuilder.toString();
 			sql += createWhere(terms);
 			
+			System.out.println(sql);
+			
 			resultSet = statement.executeQuery(this.sql);
-			resultList = new ArrayList<>();
+			//resultList = new ArrayList<>();
+			resultList = new LinkedHashMap<>();
 			while(resultSet.next()){
-				HashMap<String , Object> recode = new HashMap<>();
+				//HashMap<String , Object> recode = new HashMap<>();
 				for(int i = 0; i < select.size(); i++){
-					recode.put(select.get(i) , resultSet.getObject(select.get(i)));
+					resultList.put(select.get(i), resultSet.getObject(select.get(i)));
+					//recode.put(select.get(i) , resultSet.getObject(select.get(i)));
 				}
-				resultList.add(recode);
+				//resultList.add(recode);
 			}
 			resultSet.close();
 		} catch (SQLException e) {
@@ -197,8 +212,9 @@ public class MySQL {
 		whereBuilder.append(" where ");
 		for (Map.Entry<String , Object> term : terms.entrySet()) {
 			whereBuilder.append(term.getKey());
-			whereBuilder.append(" = ");
+			whereBuilder.append(" = '");
 			whereBuilder.append(term.getValue());
+			whereBuilder.append("'");
 		}
 		return whereBuilder.toString();
 	}
@@ -243,6 +259,7 @@ public class MySQL {
 		} catch (JsonSyntaxException | JsonIOException | FileNotFoundException e) {
 			e.printStackTrace();
 		}
+		
 	}
 	
 }

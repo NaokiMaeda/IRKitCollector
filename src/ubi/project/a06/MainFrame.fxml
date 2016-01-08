@@ -78,7 +78,7 @@
                         <Font size="14.0" />
                      </font>
                   </Text>
-                  <Slider fx:id="pollingIntervalSlider" majorTickUnit="50.0" minorTickCount="4" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="10.0" />
+                  <Slider fx:id="pollingIntervalSlider" majorTickUnit="50.0" minorTickCount="4" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="5.0" />
                   <ToggleButton fx:id="pollingButton" mnemonicParsing="false" text="Polling Start" />
                </children>
             </HBox>

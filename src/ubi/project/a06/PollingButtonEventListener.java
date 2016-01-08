@@ -19,32 +19,35 @@ public class PollingButtonEventListener implements EventHandler<ActionEvent>{
 	public void handle(ActionEvent event) {
 		if(controller.isSelectedPollingButton()){
 			controller.setPollingButton("Polling Stop");
-			
+			/*
 			pollingServiceArray = new ArrayList<>(controller.getComboBoxSize());
 			for(int i = 0; i < pollingServiceArray.size(); i++){
 				pollingServiceArray.add(new PollingService(new HTTPGet(controller.getComboBoxItem(i))));
 				pollingServiceArray.get(i).setPeriod(Duration.seconds(controller.getPollingInterval()));
-				pollingServiceArray.get(i).start();
+				System.out.println(pollingServiceArray.get(i).getState());
 				pollingServiceArray.get(i).setOnScheduled(e -> {
 					controller.setResultTextArea(pollingService.getLastValue());
 				});
 			}
-			/*
+			*/
 			pollingService = new PollingService(new HTTPGet(controller.getComboBoxItem()));
 			pollingService.setPeriod(Duration.seconds(controller.getPollingInterval()));
 			pollingService.start();
 			pollingService.setOnScheduled(e -> {
+				if(pollingService.getLastValue() == null)	return;
 				controller.setResultTextArea(pollingService.getLastValue());
 			});
-			*/
+			
 		}else{
 			controller.setPollingButton("Polling Start");
+			/*
 			for(int i = 0; i < pollingServiceArray.size(); i++){
 				if(pollingServiceArray.get(i).isRunning()){
 					pollingServiceArray.get(i).cancel();
 				}
 			}
-			//if(pollingService.isRunning())	pollingService.cancel();
+			*/
+			if(pollingService.isRunning())	pollingService.cancel();
 		}
 	}
 
