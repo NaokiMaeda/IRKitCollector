@@ -10,7 +10,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -53,10 +52,12 @@ public class PollingService extends ScheduledService<String>{
 		this.httpGet = httpGet;
 		gson 		= new Gson();					//JSON改行無し
 		//gson		= new GsonBuilder().setPrettyPrinting().create();	//JSON改行有り
+		/*
 		logDB		= new MySQL(logConfigFile);
 		commandDB	= new MySQL(commandConfigFile);
 		logDB.ConnectionDB();
 		commandDB.ConnectionDB();
+		*/
 	}
 	
 	@Override
@@ -71,10 +72,12 @@ public class PollingService extends ScheduledService<String>{
 				recode.put("time" , new Date());
 				//recode.put("ir_signal" , response);
 				
+				/*
 				inquiryCulums	= new ArrayList<>();
 				inquiryTerms	= new HashMap<>();
 				inquiryCulums.add("command_name");
 				inquiryTerms.put("ir_signal" , response);
+				
 				selectResult =  commandDB.select(inquiryCulums,inquiryTerms);
 				for(int i = 0; i < selectResult.size(); i++){
 					System.out.println(selectResult.get("command_name"));
@@ -89,8 +92,7 @@ public class PollingService extends ScheduledService<String>{
 				//recode.put("format" , message.getFormat());
 				//recode.put("freq" , message.getFreq());
 				//recode.put("data" , convertByteArray(message.getData()));
-				//SaveJSON(response);
-				SaveJSON(Arrays.toString(message.getData()));
+				saveJSON(response);
 				///logDB.insert(recode);
 				///return response;
 				return response;
@@ -101,7 +103,8 @@ public class PollingService extends ScheduledService<String>{
 	
 	private String getCurrentDate(){
 		sdf		= new SimpleDateFormat(DATE_FORMAT);
-		date	= new Date(System.currentTimeMillis());	
+		date	= new Date(System.currentTimeMillis());
+		System.out.println(sdf.format(date));
 		return sdf.format(date);
 	}
 	
@@ -128,14 +131,13 @@ public class PollingService extends ScheduledService<String>{
 		return intData;
 	}
 	
-	private void SaveJSON(String saveData){
+	private void saveJSON(String saveData){
 		if(saveData == null)	return;
 		BufferedWriter bw = null;
 		GetMessage getMessage = gson.fromJson(saveData , GetMessage.class);
 		String data = gson.toJson(getMessage);
 		try {
-			//File file = new File(getCurrentDate() + ".json");
-			File file = new File(getCurrentDate() + ".txt");
+			File file = new File(getCurrentDate() + ".json");
 			bw = new BufferedWriter(new FileWriter(file));
 			bw.write(data);
 			bw.flush();
@@ -143,7 +145,9 @@ public class PollingService extends ScheduledService<String>{
 			e.printStackTrace();
 		}finally{
 			try {
-				bw.close();
+				if(bw != null){
+					bw.close();
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

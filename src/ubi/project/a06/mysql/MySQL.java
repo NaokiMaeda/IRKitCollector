@@ -45,7 +45,6 @@ public class MySQL {
 	private ResultSetMetaData					rsmd;
 	private	ArrayList<String>					column;
 	private	LinkedHashMap<String , Object>		resultList;
-	//private	ArrayList<HashMap<String , Object>>	resultList;
 	
 	public MySQL(String configFile){
 		this.column = new ArrayList<>();
@@ -116,21 +115,17 @@ public class MySQL {
 		}
 	}
 	
-	public LinkedHashMap<String, Object> select(){
+	public LinkedHashMap<String, Object> selectAll(){
 		if(!hasDB())	return null;
 		try {
 			statement = connection.createStatement();
 			sql = "select * from " + table;
 			ResultSet result = statement.executeQuery(sql);
-			//resultList = new ArrayList<>();
 			resultList = new LinkedHashMap<>();
 			while(result.next()){
-				//HashMap<String , Object> recode = new HashMap<>();
 				for(int i = 0; i < column.size(); i++){
 					resultList.put(column.get(i), result.getString(column.get(i)));
-					//recode.put(column.get(i) , result.getObject(column.get(i)));
 				}
-				//resultList.add(recode);
 			}
 			resultSet.close();
 		} catch (SQLException e) {
@@ -156,18 +151,12 @@ public class MySQL {
 			sql = stringBuilder.toString();
 			sql += createWhere(terms);
 			
-			System.out.println(sql);
-			
 			resultSet = statement.executeQuery(this.sql);
-			//resultList = new ArrayList<>();
 			resultList = new LinkedHashMap<>();
 			while(resultSet.next()){
-				//HashMap<String , Object> recode = new HashMap<>();
 				for(int i = 0; i < select.size(); i++){
 					resultList.put(select.get(i), resultSet.getObject(select.get(i)));
-					//recode.put(select.get(i) , resultSet.getObject(select.get(i)));
 				}
-				//resultList.add(recode);
 			}
 			resultSet.close();
 		} catch (SQLException e) {
