@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import com.google.gson.Gson;
 
@@ -36,7 +37,8 @@ public class PollingService extends ScheduledService<String>{
 	private			ArrayList<String>					inquiryCulums;
 	private			HashMap<String , Object>			inquiryTerms;
 	private			LinkedHashMap<String , Object>		selectResult;
-	
+	private			LinkedHashMap<int[] , String>		commandList;
+
 	//現在時刻取得
 	private			SimpleDateFormat		sdf;
 	private			Date					date;
@@ -52,12 +54,12 @@ public class PollingService extends ScheduledService<String>{
 		this.httpGet = httpGet;
 		gson 		= new Gson();					//JSON改行無し
 		//gson		= new GsonBuilder().setPrettyPrinting().create();	//JSON改行有り
-		/*
-		logDB		= new MySQL(logConfigFile);
+		
+		//logDB		= new MySQL(logConfigFile);
+		//logDB.ConnectionDB();
 		commandDB	= new MySQL(commandConfigFile);
-		logDB.ConnectionDB();
 		commandDB.ConnectionDB();
-		*/
+		setCommandList();
 	}
 	
 	@Override
@@ -68,6 +70,9 @@ public class PollingService extends ScheduledService<String>{
 				String response = httpGet.get("messages");
 				if(response.length() == 0)	return "";
 				GetMessage message = gson.fromJson(response , GetMessage.class);
+				
+				System.out.println(getNearCommand(message.getData()));
+				/*
 				recode = new HashMap<>();
 				recode.put("time" , new Date());
 				//recode.put("ir_signal" , response);
@@ -104,7 +109,6 @@ public class PollingService extends ScheduledService<String>{
 	private String getCurrentDate(){
 		sdf		= new SimpleDateFormat(DATE_FORMAT);
 		date	= new Date(System.currentTimeMillis());
-		System.out.println(sdf.format(date));
 		return sdf.format(date);
 	}
 	
@@ -129,6 +133,31 @@ public class PollingService extends ScheduledService<String>{
 			e.printStackTrace();
 		}
 		return intData;
+	}
+	
+	private	void setCommandList(){
+		ArrayList<String> select = new ArrayList<>();
+		select.add("command_name");
+		select.add("ir_signal");
+		commandList = commandDB.getCommandList(commandDB.getCommandTableName() , select);
+	}
+	
+	private	String getNearCommand(int[] receiveData){
+		String Value = "";
+		double minEuclideanDistance = 9999;
+		for(Map.Entry<int[], String> map : commandList.entrySet()){
+			double euclideanDistance = 0;
+			for(int i = 0; i < receiveData.length; i++){
+				euclideanDistance += Math.pow((map.getKey()[i] - receiveData[i]), 2);
+			}
+			euclideanDistance = Math.sqrt(euclideanDistance);
+			System.out.println(map.getValue() + " = " + euclideanDistance);
+			if(euclideanDistance < minEuclideanDistance){
+				minEuclideanDistance = euclideanDistance;
+				Value = map.getValue();
+			}
+		}
+		return Value;
 	}
 	
 	private void saveJSON(String saveData){

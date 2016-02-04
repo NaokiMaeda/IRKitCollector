@@ -34,7 +34,7 @@
             </Text>
             <HBox prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <TextField fx:id="addIRKitTextField" maxWidth="-Infinity" prefWidth="350.0" promptText="IP Address only" />
+                  <TextField fx:id="addIRKitTextField" maxWidth="-Infinity" prefWidth="350.0" promptText="IP Address only" text="192.168.126.13" />
                   <Button fx:id="addIRKitButton" mnemonicParsing="false" prefWidth="50.0" text="Add" />
                </children>
             </HBox>

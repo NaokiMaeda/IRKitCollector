@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -18,6 +17,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
+import ubi.project.a06.message.GetMessage;
+
 public class MySQL {
 	private Connection connection;
 	
@@ -26,14 +27,14 @@ public class MySQL {
 	private	String		host;
 	private	int			port;
 	private String		DBName;
-	private	String		table;
+	private	String		commandTable;
+	private	String		logTable;
 	private String		user;
 	private	String		password;
 	private	Gson		gson;
 	
 	//SQLクエリ
 	private	Statement			statement;
-	private	PreparedStatement	preparedStatement;
 	private	String				sql;
 	private	StringBuilder		columnBuilder;
 	private	StringBuilder		valueBuilder;
@@ -55,7 +56,7 @@ public class MySQL {
 	public void ConnectionDB(){
 		try {
 			connection = DriverManager.getConnection(address , user , password);
-			column = getColumnList(column);
+			column = getColumnList(commandTable);
 			System.out.println("接続完了");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -72,7 +73,7 @@ public class MySQL {
 		}
 	}
 	
-	public void insert(HashMap<String , Object> data){
+	public void insert(String table , HashMap<String , Object> data){
 		if(!hasDB())	return;
 		try {
 			statement = connection.createStatement();
@@ -115,16 +116,16 @@ public class MySQL {
 		}
 	}
 	
-	public LinkedHashMap<String, Object> selectAll(){
+	public LinkedHashMap<String, Object> selectAll(String table){
 		if(!hasDB())	return null;
 		try {
 			statement = connection.createStatement();
 			sql = "select * from " + table;
-			ResultSet result = statement.executeQuery(sql);
+			resultSet = statement.executeQuery(sql);
 			resultList = new LinkedHashMap<>();
-			while(result.next()){
+			while(resultSet.next()){
 				for(int i = 0; i < column.size(); i++){
-					resultList.put(column.get(i), result.getString(column.get(i)));
+					resultList.put(column.get(i), resultSet.getString(column.get(i)));
 				}
 			}
 			resultSet.close();
@@ -134,7 +135,37 @@ public class MySQL {
 		return resultList;
 	}
 	
-	public LinkedHashMap<String , Object> select(ArrayList<String> select , HashMap<String, Object> terms){
+	public LinkedHashMap<String , Object> select(String table , ArrayList<String> select){
+		if(!hasDB())	return null;
+		try {
+			statement = connection.createStatement();
+			StringBuilder stringBuilder = new StringBuilder();
+			stringBuilder.append("select ");
+			for(int i = 0; i < select.size(); i++){
+				stringBuilder.append(select.get(i));
+				stringBuilder.append(", ");
+			}
+			stringBuilder.delete(stringBuilder.length() -2 , stringBuilder.length());
+			stringBuilder.append(" from ");
+			stringBuilder.append(table);
+			
+			sql = stringBuilder.toString();
+			
+			resultSet = statement.executeQuery(sql);
+			resultList = new LinkedHashMap<String , Object>();
+			while(resultSet.next()){
+				for(int i = 0; i < select.size(); i++){
+					resultList.put(select.get(i), resultSet.getObject(select.get(i)));
+				}
+			}
+			resultSet.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return resultList;
+	}
+	
+	public LinkedHashMap<String , Object> select(String table , ArrayList<String> select , HashMap<String, Object> terms){
 		if(!hasDB())	return null;
 		try {
 			statement = connection.createStatement();
@@ -151,7 +182,7 @@ public class MySQL {
 			sql = stringBuilder.toString();
 			sql += createWhere(terms);
 			
-			resultSet = statement.executeQuery(this.sql);
+			resultSet = statement.executeQuery(sql);
 			resultList = new LinkedHashMap<>();
 			while(resultSet.next()){
 				for(int i = 0; i < select.size(); i++){
@@ -165,7 +196,37 @@ public class MySQL {
 		return resultList;
 	}
 	
-	public void delete(HashMap<String , Object> deleteTerms){
+	public LinkedHashMap<int[] , String> getCommandList(String table , ArrayList<String> select){
+		if(!hasDB())	return null;
+		LinkedHashMap<int[] , String> resultList = new LinkedHashMap<>();
+		try {
+			statement = connection.createStatement();
+			StringBuilder stringBuilder = new StringBuilder();
+			stringBuilder.append("select ");
+			for(int i = 0; i < select.size(); i++){
+				stringBuilder.append(select.get(i));
+				stringBuilder.append(", ");
+			}
+			stringBuilder.delete(stringBuilder.length() -2 , stringBuilder.length());
+			stringBuilder.append(" from ");
+			stringBuilder.append(table);
+			
+			sql = stringBuilder.toString();
+			
+			resultSet = statement.executeQuery(sql);
+			Gson gson = new Gson();
+			while(resultSet.next()){
+				GetMessage message = gson.fromJson(resultSet.getString(select.get(1)) , GetMessage.class);
+				resultList.put(message.getData(), resultSet.getString(select.get(0)));
+			}
+			resultSet.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return resultList;
+	}
+	
+	public void delete(String table , HashMap<String , Object> deleteTerms){
 		if(!hasDB())	return;
 		try {
 			statement = connection.createStatement();
@@ -181,7 +242,7 @@ public class MySQL {
 		}
 	}
 	
-	public void deleteAll(){
+	public void deleteAll(String table){
 		if(!hasDB())	return;
 		try {
 			statement = connection.createStatement();
@@ -219,7 +280,7 @@ public class MySQL {
 		return false;
 	}
 	
-	private ArrayList<String> getColumnList(ArrayList<String> column){
+	private ArrayList<String> getColumnList(String table){
 		ArrayList<String> columnList = new ArrayList<>();
 		try {
 			statement = connection.createStatement();
@@ -238,17 +299,26 @@ public class MySQL {
 	private void setDBInfo(String configFile){
 		try {
 			DBInfo dbInfo = gson.fromJson(new FileReader(configFile) , DBInfo.class);
-			this.host		= dbInfo.getHost();
-			this.port		= dbInfo.getPort();
-			this.DBName 	= dbInfo.getDBName();
-			this.table		= dbInfo.getTable();
-			this.user		= dbInfo.getUser();
-			this.password	= dbInfo.getPassword();
+			this.host			= dbInfo.getHost();
+			this.port			= dbInfo.getPort();
+			this.DBName 		= dbInfo.getDBName();
+			this.commandTable	= dbInfo.getcommandTable();
+			this.logTable		= dbInfo.getlogTable();
+			this.user			= dbInfo.getUser();
+			this.password		= dbInfo.getPassword();
 			address = "jdbc:mysql://" + host + ":" + port + "/" + DBName;
 		} catch (JsonSyntaxException | JsonIOException | FileNotFoundException e) {
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public String getCommandTableName(){
+		return commandTable;
+	}
+	
+	public String getLogTableName(){
+		return logTable;
 	}
 	
 }

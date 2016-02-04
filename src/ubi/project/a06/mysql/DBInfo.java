@@ -4,7 +4,8 @@ public class DBInfo {
 	private String	host;
 	private	int		port;
 	private String	DBName;
-	private String	table;
+	private String	commandTable;
+	private	String	logTable;
 	private String	user;
 	private String	password;
 	
@@ -24,8 +25,12 @@ public class DBInfo {
 		this.DBName = DBName;
 	}
 	
-	public void setTable(String table){
-		this.table = table;
+	public void setcommandTable(String commandTable){
+		this.commandTable = commandTable;
+	}
+	
+	public void setlogTable(String logTable){
+		this.logTable = logTable;
 	}
 	
 	public void setUser(String user){
@@ -48,8 +53,12 @@ public class DBInfo {
 		return this.DBName;
 	}
 	
-	public String getTable(){
-		return this.table;
+	public String getcommandTable(){
+		return this.commandTable;
+	}
+	
+	public String getlogTable(){
+		return this.logTable;
 	}
 	
 	public String getUser(){
